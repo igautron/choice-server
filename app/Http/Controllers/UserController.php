@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function getCsrf()
+    {
+        return [
+            'asd' => csrf_token()
+        ];
+    }
+
     public function login(Request $request)
     {
         $rules = [
@@ -25,10 +32,17 @@ class UserController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user) {
             return [
                 'success' => 'error',
-                'message' => 'Something wrong'
+                'message' => 'User does not exist!'
+            ];
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return [
+                'success' => 'error',
+                'message' => 'Wrong password'
             ];
         }
         

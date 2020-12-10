@@ -31,7 +31,7 @@ class ProductController extends Controller
                 $filter_subtype = $filter_values['subtype'];
                 $product->where(function($q) use ($filter_subtype){
                     foreach ($filter_subtype as $type => $one) {
-                        $q->orWhere('type', $type);
+                        $q->orWhere('subtype', $type);
                     }
                 });
             }
@@ -92,6 +92,7 @@ class ProductController extends Controller
                 'filter_values' => $filter_values,
                 'products' => $products,
                 'count' => count($products),
+                // '$filter_subtype' => $filter_subtype,
             ];
         }
         return[

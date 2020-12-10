@@ -100,6 +100,83 @@ class UserController extends Controller
             'message' => 'Возникли проблемы при регистрации!!!',
         ];
     }
+
+    public function userUpdate(Request $request)
+    {
+        $rules = [
+            'name' => 'min:6',
+            'last_name' => 'min:6',
+            'email' => 'required|email',
+            'phone' => 'min:10',
+        ];
+
+        $messages = [
+            'email.required' => 'Поле "email" обязательно!',
+            'email.email' => 'Поле "email" не валидно!',
+        ];
+
+        $validator = validator($request->all(), $rules, $messages);
+
+        if($validator->fails()) return [
+            'success' => 'error',
+            'errors' => $validator->errors()
+        ];
+
+        $data = $validator->validated();
+
+        $updated = $request->user()->update($data);
+
+        return [
+            'success' => 'ok',
+            'user' => $request->user(),
+            'data' => $request->all(),
+            'updated' => $updated,
+            'message' => '',
+        ];
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        if ($request->new !== $request->confirm) {
+            return [
+                'success' => 'error',
+                'user' => $request->user(),
+                'data' => $request->all(),
+                'message' => 'Пароли не совпадают',
+            ];
+        }
+
+        $rules = [
+            'new' => 'required|min:8',
+        ];
+        $validator = validator($request->all(), $rules);
+        if($validator->fails()) return [
+            'success' => 'error',
+            'message' => 'Минимум 8 символов',
+            'errors' => $validator->errors()
+        ];
+
+        if (Hash::check($request->old, $user->password)) {
+            $user->password = Hash::make($request->new);
+            $user->save();
+            return [
+                'success' => $user->save() ? 'ok' : 'error',
+                'user' => $request->user(),
+                'data' => $request->all(),
+                'message' => 'ok',
+            ];
+        }else{
+            return [
+                'success' => 'error',
+                'user' => $request->user(),
+                'data' => $request->all(),
+                'message' => 'Неверный старый пароль',
+            ];
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *

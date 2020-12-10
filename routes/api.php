@@ -22,8 +22,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
+Route::get('/getCsrf', [ App\Http\Controllers\UserController::class, 'getCsrf' ]);
+
 Route::post('/login', [ App\Http\Controllers\UserController::class, 'login' ]);
 Route::post('/register', [ App\Http\Controllers\UserController::class, 'register' ]);
+
+
+Route::middleware('auth:sanctum')->post('/userUpdate', [ App\Http\Controllers\UserController::class, 'userUpdate' ]);
+Route::middleware('auth:sanctum')->post('/changePassword', [ App\Http\Controllers\UserController::class, 'changePassword' ]);
+
 
 Route::post('/sanctum/token', function (Request $request) {
     $request->validate([
